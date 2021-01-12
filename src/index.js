@@ -1,13 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import App from './App';
+import Convert from './Convert';
 import reportWebVitals from './reportWebVitals';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 ReactDOM.render(
 	<React.StrictMode>
-		<App />
+		<BrowserRouter>
+			<Switch>
+				<Route path="/convertation">
+					<Convert />
+				</Route>
+				<Route path="/">
+					<App />
+				</Route>
+			</Switch>
+		</BrowserRouter>
 	</React.StrictMode>,
 	document.getElementById('root')
 );
