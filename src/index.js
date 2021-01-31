@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import ReactDOM from 'react-dom';
+// import { Provider } from 'mobx-react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
 import App from './App';
 import Convert from './Convert';
 import reportWebVitals from './reportWebVitals';
+import { rootStore, Provider } from './store';
+
+// const MSTContext = React.createContext(null);
+
+// const Provider = MSTContext.Provider;
+
+// const useMST = (mapStateToProps) => {
+// 	const store = useContext(MSTContext);
+
+// 	if (mapStateToProps !== undefined) {
+// 		return mapStateToProps(store);
+// 	}
+
+// 	return store;
+// };
+
+const stores = {
+	rootStore
+};
 
 ReactDOM.render(
 	<React.StrictMode>
@@ -15,15 +35,12 @@ ReactDOM.render(
 					<Convert />
 				</Route>
 				<Route path="/">
-					<App />
+					<Provider value={stores}>
+						<App />
+					</Provider>
 				</Route>
 			</Switch>
 		</BrowserRouter>
 	</React.StrictMode>,
 	document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

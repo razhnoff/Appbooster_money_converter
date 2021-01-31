@@ -1,82 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { observer } from 'mobx-react';
 import { Container, Table, Spinner, Form } from 'react-bootstrap';
 import { StarFill, Star } from 'react-bootstrap-icons';
 import './App.css';
+import { useMst } from './store';
 
 function App() {
-	const exchangeRateApi = 'https://api.exchangeratesapi.io/latest';
-	const [isLoading, setLoading] = useState(true);
-	const [exhangeList, setExchangeList] = useState({});
-	const [currentExchange, setCurrentExchange] = useState('');
-	const [rateList, setRateList] = useState([]);
-	const [exchangeRatesList, setRatesList] = useState([]);
-	// const popularExchanges = ['USD', 'EUR', 'RUB'];
+	const {
+		rootStore: {
+			isLoading,
+			currentCurrency,
+			exchangeList,
+			exchangeRatesList,
+			fetchExhangeRate,
+			sortedAlphabetList,
+			setRatesList,
+			iconHandlerClick
+		}
+	} = useMst();
 
 	useEffect(() => {
 		fetchExhangeRate();
 	}, []);
-
-	const fetchExhangeRate = async () => {
-		try {
-			const response = await fetch(exchangeRateApi);
-			const result = await response.json();
-			setExchangeList(result);
-			setCurrentExchange(result.base);
-			const rateKeys = Object.keys(result.rates);
-			setRateList(rateKeys);
-			const rates = Object.keys(result.rates).reduce(
-				(acc, curr) => {
-					return {
-						...acc,
-						[curr]: {
-							value: Number(result.rates[curr].toFixed(2)),
-							isFavourite: false
-						}
-					};
-				},
-				{
-					[result.base]: { value: 1, isFavourite: false }
-				}
-			);
-			const ratesList = Object.keys(rates).map((item, key) => {
-				return {
-					key: item,
-					value: rates[item].value,
-					isFavourite: false,
-					id: key + 1
-				};
-			});
-			console.log('ratesList', ratesList);
-			setRatesList(ratesList);
-		} catch (err) {
-			console.error(err);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const alpabetSortFunc = (a, b) => {
-		return a.key.toLowerCase().localeCompare(b.key.toLowerCase());
-	};
-
-	const sortedAlphabetList = exchangeRatesList
-		.filter((item) => {
-			return item.key !== currentExchange;
-		})
-		.sort(alpabetSortFunc);
-
-	const iconHandlerClick = (ev) => {
-		const currencyKey = ev.currentTarget.dataset.key;
-
-		const transformedList = exchangeRatesList.map((item) => {
-			if (item.key === currencyKey) {
-				return { ...item, isFavourite: !item.isFavourite };
-			}
-
-			return { ...item };
-		});
-		setRatesList(transformedList);
-	};
 
 	const iconsWrapperStyleOptions = {
 		display: 'flex',
@@ -86,7 +31,8 @@ function App() {
 	};
 
 	const iconStyleOptions = {
-		marginBottom: '4px'
+		marginBottom: '4px',
+		cursor: 'pointer'
 	};
 
 	const renderTableBodyRows = () => {
@@ -129,8 +75,8 @@ function App() {
 
 	const handleSelectChange = (event) => {
 		const currency = event.target.value;
-		recalculateCurrencies(currentExchange, currency);
-		setCurrentExchange(currency);
+		// recalculateCurrencies(currentCurrency, currency);
+		// setCurrentExchange(currency);
 	};
 
 	const filteredSelectRates = () => {
@@ -176,7 +122,7 @@ function App() {
 		// 				return (
 		// 					<option
 		// 						key={key}
-		// 						selected={currentExchange === value}
+		// 						selected={currentCurrency === value}
 		// 						{...(transformedList[value].isFavourite
 		// 							? { style: { 'font-weight': 'bold' } }
 		// 							: '')}>
@@ -207,14 +153,11 @@ function App() {
 		);
 	}
 
-	console.log(exhangeList);
-	console.log(exchangeRatesList);
-
 	return (
 		<Container fluid>
 			<Table striped hover bordered variant="dark">
 				<thead>
-					<tr>Current currency: {exhangeList.base}</tr>
+					<tr>Current currency: {exchangeList.base}</tr>
 					<tr>
 						{renderTableHeaders()}
 						{/* {renderCurrencySelection()} */}
@@ -226,4 +169,4 @@ function App() {
 	);
 }
 
-export default App;
+export default observer(App);
